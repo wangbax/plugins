@@ -4,25 +4,24 @@
 import 'package:file/memory.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
-import 'package:path_provider_linux/path_provider_linux.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:shared_preferences_linux/shared_preferences_linux.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 
 void main() {
   late MemoryFileSystem fs;
-  late PathProviderLinux pathProvider;
 
   SharedPreferencesLinux.registerWith();
 
   setUp(() {
     fs = MemoryFileSystem.test();
-    pathProvider = FakePathProviderLinux();
+    PathProviderPlatform.instance = FakePathProviderLinux();
   });
 
   Future<String> _getFilePath() async {
-    final String? directory = await pathProvider.getApplicationSupportPath();
-    return path.join(directory!, 'shared_preferences.json');
+    final String directory = (await getApplicationSupportDirectory()).path;
+    return path.join(directory, 'shared_preferences.json');
   }
 
   Future<void> _writeTestFile(String value) async {
@@ -38,7 +37,6 @@ void main() {
   SharedPreferencesLinux _getPreferences() {
     final SharedPreferencesLinux prefs = SharedPreferencesLinux();
     prefs.fs = fs;
-    prefs.pathProvider = pathProvider;
     return prefs;
   }
 
@@ -91,8 +89,7 @@ void main() {
 ///
 /// Note that this should only be used with an in-memory filesystem, as the
 /// path it returns is a root path that does not actually exist on Linux.
-class FakePathProviderLinux extends PathProviderPlatform
-    implements PathProviderLinux {
+class FakePathProviderLinux extends PathProviderPlatform {
   @override
   Future<String?> getApplicationSupportPath() async => r'/appsupport';
 

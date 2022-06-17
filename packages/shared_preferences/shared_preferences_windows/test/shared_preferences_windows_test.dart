@@ -5,23 +5,22 @@
 import 'package:file/memory.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-import 'package:path_provider_windows/path_provider_windows.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 import 'package:shared_preferences_windows/shared_preferences_windows.dart';
 
 void main() {
   late MemoryFileSystem fileSystem;
-  late PathProviderWindows pathProvider;
 
   setUp(() {
     fileSystem = MemoryFileSystem.test();
-    pathProvider = FakePathProviderWindows();
+    PathProviderPlatform.instance = FakePathProviderWindows();
   });
 
   Future<String> _getFilePath() async {
-    final String? directory = await pathProvider.getApplicationSupportPath();
-    return path.join(directory!, 'shared_preferences.json');
+    final String directory = (await getApplicationSupportDirectory()).path;
+    return path.join(directory, 'shared_preferences.json');
   }
 
   Future<void> _writeTestFile(String value) async {
@@ -37,7 +36,6 @@ void main() {
   SharedPreferencesWindows _getPreferences() {
     final SharedPreferencesWindows prefs = SharedPreferencesWindows();
     prefs.fs = fileSystem;
-    prefs.pathProvider = pathProvider;
     return prefs;
   }
 
@@ -90,10 +88,7 @@ void main() {
 ///
 /// Note that this should only be used with an in-memory filesystem, as the
 /// path it returns is a root path that does not actually exist on Windows.
-class FakePathProviderWindows extends PathProviderPlatform
-    implements PathProviderWindows {
-  @override
-  late VersionInfoQuerier versionInfoQuerier;
+class FakePathProviderWindows extends PathProviderPlatform {
 
   @override
   Future<String?> getApplicationSupportPath() async => r'C:\appsupport';
@@ -110,6 +105,4 @@ class FakePathProviderWindows extends PathProviderPlatform
   @override
   Future<String?> getDownloadsPath() async => null;
 
-  @override
-  Future<String> getPath(String folderID) async => '';
 }

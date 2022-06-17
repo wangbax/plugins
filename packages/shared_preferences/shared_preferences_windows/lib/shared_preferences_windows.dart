@@ -9,7 +9,7 @@ import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:path/path.dart' as path;
-import 'package:path_provider_windows/path_provider_windows.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 
 /// The Windows implementation of [SharedPreferencesStorePlatform].
@@ -30,10 +30,6 @@ class SharedPreferencesWindows extends SharedPreferencesStorePlatform {
   @visibleForTesting
   FileSystem fs = const LocalFileSystem();
 
-  /// The path_provider_windows instance used to find the support directory.
-  @visibleForTesting
-  PathProviderWindows pathProvider = PathProviderWindows();
-
   /// Local copy of preferences
   Map<String, Object>? _cachedPreferences;
 
@@ -45,8 +41,8 @@ class SharedPreferencesWindows extends SharedPreferencesStorePlatform {
     if (_localDataFilePath != null) {
       return _localDataFilePath!;
     }
-    final String? directory = await pathProvider.getApplicationSupportPath();
-    if (directory == null) {
+    final String directory = (await getApplicationSupportDirectory()).path;
+    if (directory.isEmpty) {
       return null;
     }
     return _localDataFilePath =

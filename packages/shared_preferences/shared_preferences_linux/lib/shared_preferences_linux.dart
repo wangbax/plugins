@@ -9,7 +9,7 @@ import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:path/path.dart' as path;
-import 'package:path_provider_linux/path_provider_linux.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 
 /// The Linux implementation of [SharedPreferencesStorePlatform].
@@ -33,14 +33,10 @@ class SharedPreferencesLinux extends SharedPreferencesStorePlatform {
   @visibleForTesting
   FileSystem fs = const LocalFileSystem();
 
-  /// The path_provider_linux instance used to find the support directory.
-  @visibleForTesting
-  PathProviderLinux pathProvider = PathProviderLinux();
-
   /// Gets the file where the preferences are stored.
   Future<File?> _getLocalDataFile() async {
-    final String? directory = await pathProvider.getApplicationSupportPath();
-    if (directory == null) {
+    final String directory = (await getApplicationSupportDirectory()).path;
+    if (directory.isEmpty) {
       return null;
     }
     return fs.file(path.join(directory, 'shared_preferences.json'));
