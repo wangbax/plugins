@@ -1,3 +1,7 @@
+## 2.1.2
+
+* Use path_provider directly in windows/linux
+
 ## 2.1.1
 
 * Removes unnecessary imports.

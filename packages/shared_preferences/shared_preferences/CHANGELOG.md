@@ -1,3 +1,7 @@
+## 2.0.16
+
+* Use path_provider directly in windows/linux
+
 ## 2.0.15
 
 * Minor fixes for new analysis options.
